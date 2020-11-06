@@ -8,9 +8,9 @@
   #    #     ***** ***** ***** ***** *
 *                                    *
 *************************************/
-#include <Arduboy.h>
+#include <Arduboy2.h>
 //startup sound at line 260
-Arduboy arduboy;
+Arduboy2 arduboy;
 //Variables declared here
 int8_t gamestate = 0;
 bool released = 0;
@@ -31,6 +31,15 @@ bool twoplayer = false;
 bool demo = false;
 bool nonsense = true;
 bool flash = true;
+// Wrap the Arduino tone() function so that the pin doesn't have to be
+// specified each time. Also, don't play if audio is set to off.
+void playTone(unsigned int frequency, unsigned long duration)
+{
+  if (arduboy.audio.enabled() == true)
+  {
+    tone(PIN_SPEAKER_1, frequency, duration);
+  }
+}
 void resetgame() {
   ballx = WIDTH / 2;
   bally = HEIGHT / 2;
@@ -75,7 +84,7 @@ void toggleGameState() {
   //toggle twoplayer
   if ((arduboy.pressed(UP_BUTTON) || arduboy.pressed(DOWN_BUTTON)) && released && !demo) {
     released = false;
-    arduboy.tunes.tone(523, 200);
+    playTone(523, 200);
     if (twoplayer) twoplayer = false;
     else twoplayer = true;
   }
@@ -112,13 +121,13 @@ void ball() {
   if (bally < 0) {
     movey = -movey;
     bally = 0;
-    arduboy.tunes.tone(523, 200);
+    playTone(523, 200);
   }
   //Reflect the ball off of the bottom of the screen
   if (bally + ballsize > HEIGHT) {
     movey = -movey;
     bally = HEIGHT - ballsize;
-    arduboy.tunes.tone(523, 200);
+    playTone(523, 200);
   }
 }
 void player2AI() {
@@ -140,7 +149,7 @@ void score() {
     ballx = WIDTH / 2;
     movey = 0;
     bally = HEIGHT / 2;
-    arduboy.tunes.tone(175, 200);
+    playTone(175, 200);
     //Give the player2 a point
     player2score = player2score + 1;
   }
@@ -150,7 +159,7 @@ void score() {
     ballx = WIDTH / 2;
     movey = 0;
     bally = HEIGHT / 2;
-    arduboy.tunes.tone(175, 200);
+    playTone(175, 200);
     //Give the player1 a point
     player1score = player1score + 1;
   }
@@ -186,7 +195,7 @@ void player1() {
     //bonce it back
     movex = -movex;
     //sounds
-    arduboy.tunes.tone(200, 200);
+    playTone(200, 200);
   }
 }
 void player2() {
@@ -215,7 +224,7 @@ void player2() {
     //bonce it back
     movex = -movex;
     //sounds
-    arduboy.tunes.tone(200, 200);
+    playTone(200, 200);
   }
 }
 void setup() {
@@ -224,9 +233,9 @@ void setup() {
   arduboy.initRandomSeed();
   if (arduboy.audio.enabled()) arduboy.audio.on();
   else arduboy.audio.off();
-  arduboy.tunes.tone(987, 160);
+  playTone(987, 160);
   delay(160);
-  arduboy.tunes.tone(1318, 400);
+  playTone(1318, 400);
 }
 void loop() {
   //Prevent the Arduboy from running too fast
@@ -286,9 +295,9 @@ void loop() {
         arduboy.setTextSize(3);
         if (nonsense) {
           nonsense = false;
-          arduboy.tunes.tone(987, 160);
+          playTone(987, 160);
           delay(160);
-          arduboy.tunes.tone(1318, 400);
+          playTone(1318, 400);
         }
         //Change the gamestate
         if (arduboy.pressed(LEFT_BUTTON) and released) {
@@ -309,9 +318,9 @@ void loop() {
         arduboy.setTextSize(3);
         if (nonsense) {
           nonsense = false;
-          arduboy.tunes.tone(987, 160);
+          playTone(987, 160);
           delay(160);
-          arduboy.tunes.tone(1318, 400);
+          playTone(1318, 400);
         }
         //Change the gamestate
         if (arduboy.pressed(LEFT_BUTTON) and released) {
